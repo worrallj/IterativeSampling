@@ -1,0 +1,168 @@
+% !TEX TS-program = pdflatex
+% !TEX encoding = UTF-8 Unicode
+
+% This is a simple template for a LaTeX document using the "article" class.
+% See "book", "report", "letter" for other types of document.
+
+\documentclass[11pt]{article} % use larger type; default would be 10pt
+
+\usepackage[utf8]{inputenc} % set input encoding (not needed with XeLaTeX)
+
+%%% Examples of Article customizations
+% These packages are optional, depending whether you want the features they provide.
+% See the LaTeX Companion or other references for full information.
+
+%%% PAGE DIMENSIONS
+\usepackage{geometry} % to change the page dimensions
+\geometry{a4paper} % or letterpaper (US) or a5paper or....
+% \geometry{margin=2in} % for example, change the margins to 2 inches all round
+% \geometry{landscape} % set up the page for landscape
+%   read geometry.pdf for detailed page layout information
+
+\usepackage{graphicx} % support the \includegraphics command and options
+
+% \usepackage[parfill]{parskip} % Activate to begin paragraphs with an empty line rather than an indent
+
+
+%%% PACKAGES
+\usepackage{booktabs} % for much better looking tables
+\usepackage{array} % for better arrays (eg matrices) in maths
+\usepackage{paralist} % very flexible & customisable lists (eg. enumerate/itemize, etc.)
+\usepackage{verbatim} % adds environment for commenting out blocks of text & for better verbatim
+\usepackage{subfig} % make it possible to include more than one captioned figure/table in a single float
+% These packages are all incorporated in the memoir class to one degree or another...
+\usepackage{amsfonts}
+\usepackage{hyperref}
+\usepackage{caption}
+
+\bibliographystyle{plain}
+
+%%% HEADERS & FOOTERS
+\usepackage{fancyhdr} % This should be set AFTER setting up the page geometry
+\pagestyle{fancy} % options: empty , plain , fancy
+\renewcommand{\headrulewidth}{0pt} % customise the layout...
+\lhead{}\chead{}\rhead{}
+\lfoot{}\cfoot{\thepage}\rfoot{}
+
+%%% SECTION TITLE APPEARANCE
+\usepackage{sectsty}
+\allsectionsfont{\sffamily\mdseries\upshape} % (See the fntguide.pdf for font help)
+% (This matches ConTeXt defaults)
+
+%%% ToC (table of contents) APPEARANCE
+\usepackage[nottoc,notlof,notlot]{tocbibind} % Put the bibliography in the ToC
+\usepackage[titles,subfigure]{tocloft} % Alter the style of the Table of Contents
+\renewcommand{\cftsecfont}{\rmfamily\mdseries\upshape}
+\renewcommand{\cftsecpagefont}{\rmfamily\mdseries\upshape} % No bold!
+
+
+%%% END Article customizations
+
+%%% The "real" document content comes below...
+
+\title{An Iterative Cutoff Sampling Method Applied to an Annual Oil and Gas Reserves Report}
+\author{Jason Worrall, Samson Adeshiyan\\
+U.S. Energy Information Administration, Forrestal Bldg., Washington DC 20585}
+%\date{} % Activate to display a given date or no date (if empty),
+         % otherwise the current date is printed 
+
+
+%%%Bibliography Cutomization
+\bibliographystyle{apalike}
+
+\begin{document}
+\maketitle
+
+\section{Introduction}
+This paper presents a procedure for selecting a cutoff sample of multiple data items using noncontiguous estimation and publication groups. The procedure is intended to select a sample of minimal size needed to obtain given target Relative Standard Errors (RSEs) for each publication item. It builds on work by Jim Knaub at the Energy Information Administration in model based sampling to present a generalizeable framework for cutoff sample selection.  Knaub 2013 \cite{Knaub2013} presents a methodology in the case of the Classical Ratio Estimator (CRE) for estimating the approximate sample coverage needed to achieve a target RSE, but no general procedure has been described for optimizing sample size accross multiple data items or estimation and publication groups, nor for weighted least squares linear models aside from the CRE. This work attempts to do that.
+\par
+The case study for this methodology is EIA's Form EIA-23, ``Annual Survey of Domestic Oil and Gas Reserves''. This survey collects annual production and year ending reserves from a sample of oil and gas well operators.  Estimates of total reserves are then published in EIA's ``Annual Domestic Oil and Gas Reserves Report'' by state, subdivision, and reservoir type. The sampling frame is provided by ``DrillingInfo'' (DI), a subscription database of monthly oil and gas production by well, which has information on well charactaristics and current operator identification.
+
+\section{The Problem}
+Respondents to the EIA-23 are oil and gas well operators. They may operate many different wells in many different regions all accross the country. The EIA-23 estimates are based on the gamma super population model (equation \ref{eq:gamma}):
+
+\begin{equation} \label{eq:gamma}
+y_i=\beta x_i + x_i^{\gamma}\epsilon_i
+\end{equation}
+
+where $y_i$ represents an operator's year ending reserves, $x_i$ their annual production, and $\epsilon_i$ is a random disturbance with mean zero and variance $\sigma^2$. This model is estimated by weighted least squares with weights equal to $x_i^{-2\gamma}$.  Oil and gas wells are not homogenous, and different regions and reservoir types have different charactaristics that effect the relationship between reported production and reserves. So equation \ref{eq:gamma} must be estimated separately for each region and reservoir type, yeilding distinct estimation groups. In addition, the Annual Reserves Report publishes reserves by state, subdivision, and reservoir type, yeilding distinct publication groups. These groups are noncontiguous, meaning estimation groups are not necessarily contained within a single publication group, nor are publication groups contained within a single estimation group. The situation is illustrated in figure PUT A FIGURE HERE. 
+
+As a result, the total reserves to be estimated for a given publication group $p$ made up of estimation groups $e\in (1,E)$ is given by equation 
+\ref{eq:estpub}.
+
+\begin{equation} \label{eq:estpub}
+\hat{T_p}= \sum_{e=1}^{E} \left( \sum_{i=1}^n y_{i,e,p} + \sum_{i=n+1}^N \hat{\beta_e} x_{i,e,p}\right)
+\end{equation}
+
+If there were only a single estimation group and publication group, [WHO SHOWS THIS?] shows that the RSE of the error in this total is 
+\[
+RSE=\frac{\sqrt{V(T-\hat{T})}}{\hat{T}}
+\]
+\begin{equation} \label{eq:var}
+V(T-\hat{T})=\hat{\sigma}^2 \left(   \sum_{i=n+1}^{N} x_i^{2\gamma} + \left(\sum_{i=n+1}^N x_i\right)^2 \left(\sum_{i=1}^n x_i^{2-2\gamma}\right)^{-1}   \right)
+\end{equation}
+with
+\[
+\hat{\sigma}^2=\sum_{i=1}^n \frac{(y_i - \hat{y}_i)^2}{x_i^{2 \gamma}(n-1)}
+\]
+With arbitrary estimation and publication groups, the variance of a particular publication group will be given by the sum of the variance of each piece, as we are assuming independence in $\epsilon_i$ accross observations, and so independence of $\hat{\beta}$ accross different estimation groups.
+\begin{equation} \label{eq:pubvar}
+V(T_p-\hat{T}_p) = \sum_{e=1}^{E} \left(\hat{\sigma_e}^2 \left(   \sum_{i=n+1}^{N} x_{i,e,p}^{2\gamma} + \left(\sum_{i=n+1}^N x_{i,e,p}\right)^2 \left(\sum_{i=1}^n x_{i,e}^{2-2\gamma}\right)^{-1}   \right) \right)
+\end{equation}
+With this formula in hand, the question becomes: what is the smallest sample that will achieve RSE targets? Given a target RSE, reference \cite{Knaub2013} shows in the case of $\gamma=0.5$ and a single estimation group that the needed sample coverage to achieve a target RSE is a function of only three quantities: the anticipated value of of $\sigma^2$, the anticipated total $y_i$ across all population units ($T_y$), and the total $x_i$ across all population units ($T_x$). 
+
+One could simply apply that methodology to each estimation/publication ($ep$) group combination individually, using the RSE target for the publication group for each $ep$ group, and then combine the samples from each $ep$ peice to get the sample for the publication group. Unfortunately, this will yield suboptimal results, especially since a particular estimation group may make up a relatively small portion of the publiacation group, and so sampling to achieve such low RSEs in such a small area is not be required. In the next section we present a procedure for selecting a cutoff sample in this general case that attempts to avoid such inefficiencies.
+
+\section{Proposed Procedure}
+Examining equation \ref{eq:pubvar}, we may follow in the footsteps of reference \cite{Knaub2013} and consider the optimal sample $S$ to be a function of the target RSE, $R$, the expected total dependent variable $T_p$, the anticipated $\sigma_e^2$, and the full regressor data, $\mathbf{X}$. In other words there exists a function, $f: (R,T_p,\sigma_e^2,\mathbf{X}) \rightarrow S$. However, this function will be completely intractable in most cases. So, we propose a methodology that iteratively adds to the sample for a given publication group, always adding the operator that will reduce the anticipated RSE by the most. Explicitely:
+\begin{enumerate}
+\item
+Obtain anticipated $\sigma_e^2$ and $\beta_e$ for each estimation group using whatever means are available.
+\item
+Consider a particular publication group $p$.
+\item
+Add to the sample the largest unit from each estimation/publication group combination $(e_1,p) ... (e_E,p)$ that makes up $p$.
+\item
+Calculate what the anticipated RSE on $T_p$ would be if the largest unit from $(e_1,p)$ were added to the sample. Repeat for $(e_2,p) ... (e_E,p)$. 
+\item
+Add to the sample the unit that lowered the RSE by the most.
+\item
+Repeat 3-5 until the RSE has been brought below the cutoff.
+\item
+Repeat 2-6 for every publication group.
+\end{enumerate}
+This procedure attempts to minimize ineffiencies by accounting for all estimation group within a publication group while building the sample, but does not make considerations accross publication groups. That is the subject of further work.
+
+The reason for step (3) is to avoid having $ep$ groups that are entirely unrepresented, and to enable the use of equation \ref{eq:pubvar}. If there is an excessively large number of $ep$ groups, one may consider only adding the largest operator from each estimation group, rather than from each $ep$ group.
+
+
+\section{Results}
+Consider the case of sampling Colorado gas reserves.  The EIA-23 divides Colorado into eight geological provinces/estimation gorups, labeled as $A-H$ here. Estimates of $\beta$ and $\sigma^2$ based on historical data are presented in table \ref{tab:E_ests}, where $T_{COx}$ is the total Colorado $x$ for the estimation group. 
+\\
+\begin{table}[h]
+\begin{tabular}{r||c|c|c|} 
+Estimation Group & $T_{CO x}$  & $\hat{\sigma}^2$ & $\hat{\beta}$\\
+\hline
+A & 1,225 & 68.2 & 11.08\\
+B & 832,684 & 55.8 & 9.0 \\
+C & 365,067 & 115.6 & 13.0 \\
+D & 6,129 & 25.3 & 7.3 \\
+E & 27,906 & 74.9 & 13.3 \\
+F & 14,688 & 99.0 & 10.2 \\
+G & 9,347 & 100.0 & 13.1 \\
+H & 764,569 & 90.5 & 13.2 \\
+\end{tabular}
+\caption{Estimation Groups}
+\label{tab:E_ests}
+\end{table}
+\\
+Looking at the numbers in table \ref{tab:E_ests}, groups $B$ and $H$ make up the majority of the production. It stands to reason that more respondents from those groups will be necessary. In addtion, group $H$ has both higher $\sigma^2$ and $\beta$ estimates, which will increase the needed sample size. Applying the procedure outlined in the last section, a sample of 14 respondents is necessary to achieve an expected RSE of 5\% in Colorado. Group $B$ has 5 respondents sampled, group $C$ has 2, and group $H$ has 4. All the remaining groups have only a single operator sampled (remember that the largest operator from each group is always sampled). Two operators sampled had production in two regions.
+
+If each $ep$ group is targeted at the 5\% RSE level seperately, adding respondents until the RSE for each falls below 5\%, the sample size calculated is 51. This is a dramatic difference, understood as a result of the five smallest estimation groups making up only 3\% of the Colorado total. If the analysis is restricted to the two largest estimation groups ($B$, $H$), seperately sampling from the two groups yields a sample size of 12 while the proposed procedure yields a sample size of only 9. 
+
+In practice, statisticians selecting cutoff samples will often use a cutoff that has been shown to give satisfactory RSEs, but the cutoff is often \emph{not determined by the RSE}. It is specified exogenously or determined based on some other criteria. The proposed approach allows statisticians to ground cutoff sample selection explicitely on the expected variance of the final estimate for arbitrary estimation/publication groupings.
+
+\bibliography{Master}
+
+
+\end{document}
