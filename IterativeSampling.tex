@@ -1,30 +1,64 @@
-% !TEX TS-program = pdflatex
-% !TEX encoding = UTF-8 Unicode
+\documentclass[11pt]{article}\usepackage[]{graphicx}\usepackage[]{color}
+%% maxwidth is the original width if it is less than linewidth
+%% otherwise use linewidth (to make sure the graphics do not exceed the margin)
+\makeatletter
+\def\maxwidth{ %
+  \ifdim\Gin@nat@width>\linewidth
+    \linewidth
+  \else
+    \Gin@nat@width
+  \fi
+}
+\makeatother
 
-% This is a simple template for a LaTeX document using the "article" class.
-% See "book", "report", "letter" for other types of document.
+\definecolor{fgcolor}{rgb}{0.345, 0.345, 0.345}
+\newcommand{\hlnum}[1]{\textcolor[rgb]{0.686,0.059,0.569}{#1}}%
+\newcommand{\hlstr}[1]{\textcolor[rgb]{0.192,0.494,0.8}{#1}}%
+\newcommand{\hlcom}[1]{\textcolor[rgb]{0.678,0.584,0.686}{\textit{#1}}}%
+\newcommand{\hlopt}[1]{\textcolor[rgb]{0,0,0}{#1}}%
+\newcommand{\hlstd}[1]{\textcolor[rgb]{0.345,0.345,0.345}{#1}}%
+\newcommand{\hlkwa}[1]{\textcolor[rgb]{0.161,0.373,0.58}{\textbf{#1}}}%
+\newcommand{\hlkwb}[1]{\textcolor[rgb]{0.69,0.353,0.396}{#1}}%
+\newcommand{\hlkwc}[1]{\textcolor[rgb]{0.333,0.667,0.333}{#1}}%
+\newcommand{\hlkwd}[1]{\textcolor[rgb]{0.737,0.353,0.396}{\textbf{#1}}}%
 
-\documentclass[11pt]{article} % use larger type; default would be 10pt
+\usepackage{framed}
+\makeatletter
+\newenvironment{kframe}{%
+ \def\at@end@of@kframe{}%
+ \ifinner\ifhmode%
+  \def\at@end@of@kframe{\end{minipage}}%
+  \begin{minipage}{\columnwidth}%
+ \fi\fi%
+ \def\FrameCommand##1{\hskip\@totalleftmargin \hskip-\fboxsep
+ \colorbox{shadecolor}{##1}\hskip-\fboxsep
+     % There is no \\@totalrightmargin, so:
+     \hskip-\linewidth \hskip-\@totalleftmargin \hskip\columnwidth}%
+ \MakeFramed {\advance\hsize-\width
+   \@totalleftmargin\z@ \linewidth\hsize
+   \@setminipage}}%
+ {\par\unskip\endMakeFramed%
+ \at@end@of@kframe}
+\makeatother
 
+\definecolor{shadecolor}{rgb}{.97, .97, .97}
+\definecolor{messagecolor}{rgb}{0, 0, 0}
+\definecolor{warningcolor}{rgb}{1, 0, 1}
+\definecolor{errorcolor}{rgb}{1, 0, 0}
+\newenvironment{knitrout}{}{} % an empty environment to be redefined in TeX
+
+\usepackage{alltt} % use larger type; default would be 10pt
 \usepackage[utf8]{inputenc} % set input encoding (not needed with XeLaTeX)
-
-%%% Examples of Article customizations
-% These packages are optional, depending whether you want the features they provide.
-% See the LaTeX Companion or other references for full information.
-
 %%% PAGE DIMENSIONS
 \usepackage{geometry} % to change the page dimensions
 \geometry{a4paper} % or letterpaper (US) or a5paper or....
 % \geometry{margin=2in} % for example, change the margins to 2 inches all round
 % \geometry{landscape} % set up the page for landscape
 %   read geometry.pdf for detailed page layout information
-
 \usepackage{graphicx} % support the \includegraphics command and options
-
 % \usepackage[parfill]{parskip} % Activate to begin paragraphs with an empty line rather than an indent
 
-
-%%% PACKAGES
+%%% MY PACKAGES
 \usepackage{booktabs} % for much better looking tables
 \usepackage{array} % for better arrays (eg matrices) in maths
 \usepackage{paralist} % very flexible & customisable lists (eg. enumerate/itemize, etc.)
@@ -34,8 +68,7 @@
 \usepackage{amsfonts}
 \usepackage{hyperref}
 \usepackage{caption}
-
-\bibliographystyle{plain}
+\usepackage{natbib} % Divine intervention help you if you need to use a different citation package.
 
 %%% HEADERS & FOOTERS
 \usepackage{fancyhdr} % This should be set AFTER setting up the page geometry
@@ -57,24 +90,18 @@
 
 
 %%% END Article customizations
-
 %%% The "real" document content comes below...
-
 \title{An Iterative Cutoff Sampling Method Applied to an Annual Oil and Gas Reserves Report}
 \author{Jason Worrall, Samson Adeshiyan\\
 U.S. Energy Information Administration, Forrestal Bldg., Washington DC 20585}
 %\date{} % Activate to display a given date or no date (if empty),
-         % otherwise the current date is printed 
-
-
-%%%Bibliography Cutomization
-\bibliographystyle{apalike}
-
+         % otherwise the current date is printed
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
 \begin{document}
 \maketitle
-
 \section{Introduction}
-This paper presents a procedure for selecting a cutoff sample of multiple data items using noncontiguous estimation and publication groups. The procedure is intended to select a sample of minimal size needed to obtain given target Relative Standard Errors (RSEs) for each publication item. It builds on work by Jim Knaub at the Energy Information Administration in model based sampling to present a generalizeable framework for cutoff sample selection.  Knaub 2013 \cite{Knaub2013} presents a methodology in the case of the Classical Ratio Estimator (CRE) for estimating the approximate sample coverage needed to achieve a target RSE, but no general procedure has been described for optimizing sample size accross multiple data items or estimation and publication groups, nor for weighted least squares linear models aside from the CRE. This work attempts to do that.
+This paper presents a procedure for selecting a cutoff sample of multiple data items using noncontiguous estimation and publication groups. The procedure is intended to select a sample of minimal size needed to obtain given target Relative Standard Errors (RSEs) for each publication item. It builds on work by Jim Knaub at the Energy Information Administration in model based sampling to present a generalizeable framework for cutoff sample selection.  Knaub 2013 \cite{Knaub2013} 
+presents a methodology in the case of the Classical Ratio Estimator (CRE) for estimating the approximate sample coverage needed to achieve a target RSE, but no general procedure has been described for optimizing sample size accross multiple data items or estimation and publication groups, nor for weighted least squares linear models aside from the CRE. This work attempts to do that.
 \par
 The case study for this methodology is EIA's Form EIA-23, ``Annual Survey of Domestic Oil and Gas Reserves''. This survey collects annual production and year ending reserves from a sample of oil and gas well operators.  Estimates of total reserves are then published in EIA's ``Annual Domestic Oil and Gas Reserves Report'' by state, subdivision, and reservoir type. The sampling frame is provided by ``DrillingInfo'' (DI), a subscription database of monthly oil and gas production by well, which has information on well charactaristics and current operator identification.
 
@@ -114,7 +141,8 @@ With this formula in hand, the question becomes: what is the smallest sample tha
 One could simply apply that methodology to each estimation/publication ($ep$) group combination individually, using the RSE target for the publication group for each $ep$ group, and then combine the samples from each $ep$ peice to get the sample for the publication group. Unfortunately, this will yield suboptimal results, especially since a particular estimation group may make up a relatively small portion of the publiacation group, and so sampling to achieve such low RSEs in such a small area is not be required. In the next section we present a procedure for selecting a cutoff sample in this general case that attempts to avoid such inefficiencies.
 
 \section{Proposed Procedure}
-Examining equation \ref{eq:pubvar}, we may follow in the footsteps of reference \cite{Knaub2013} and consider the optimal sample $S$ to be a function of the target RSE, $R$, the expected total dependent variable $T_p$, the anticipated $\sigma_e^2$, and the full regressor data, $\mathbf{X}$. In other words there exists a function, $f: (R,T_p,\sigma_e^2,\mathbf{X}) \rightarrow S$. However, this function will be completely intractable in most cases. So, we propose a methodology that iteratively adds to the sample for a given publication group, always adding the operator that will reduce the anticipated RSE by the most. Explicitely:
+Examining equation \ref{eq:pubvar}, we may follow in the footsteps of reference \cite{Knaub2013} 
+and consider the optimal sample $S$ to be a function of the target RSE, $R$, the expected total dependent variable $T_p$, the anticipated $\sigma_e^2$, and the full regressor data, $\mathbf{X}$. In other words there exists a function, $f: (R,T_p,\sigma_e^2,\mathbf{X}) \rightarrow S$. However, this function will be completely intractable in most cases. So, we propose a methodology that iteratively adds to the sample for a given publication group, always adding the operator that will reduce the anticipated RSE by the most. Explicitely:
 \begin{enumerate}
 \item
 Obtain anticipated $\sigma_e^2$ and $\beta_e$ for each estimation group using whatever means are available.
@@ -162,6 +190,7 @@ If each $ep$ group is targeted at the 5\% RSE level seperately, adding responden
 
 In practice, statisticians selecting cutoff samples will often use a cutoff that has been shown to give satisfactory RSEs, but the cutoff is often \emph{not determined by the RSE}. It is specified exogenously or determined based on some other criteria. The proposed approach allows statisticians to ground cutoff sample selection explicitely on the expected variance of the final estimate for arbitrary estimation/publication groupings.
 
+\bibliographystyle{plain}
 \bibliography{Master}
 
 
